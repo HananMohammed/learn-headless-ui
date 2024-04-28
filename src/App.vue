@@ -1,75 +1,69 @@
 <template>
-  <div class="min-h-screen bg-gray-200 text-gray-900">
-    <div class="container mx-auto">
-      <h5 class="font-bold text-xl pt-2"> Dialog (Modal)</h5>
-
-      <button class="flex items-center bg-blue-400 text-white rounded px-4 py-2"
-              @click="openModal">
-          open Modal
-      </button>
-
-      <TransitionRoot appear :show="isOpen" as="template">
-        <Dialog as="div" @close="closeModal" class="relative z-10">
-          <TransitionChild
+  <div class="w-full px-4 py-16">
+    <div class="mx-auto w-full max-w-md">
+      <RadioGroup v-model="selected">
+        <RadioGroupLabel class="sr-only">Server size</RadioGroupLabel>
+        <div class="space-y-2">
+          <RadioGroupOption
               as="template"
-              enter="duration-300 ease-out"
-              enter-from="opacity-0"
-              enter-to="opacity-100"
-              leave="duration-200 ease-in"
-              leave-from="opacity-100"
-              leave-to="opacity-0"
+              v-for="plan in plans"
+              :key="plan.name"
+              :value="plan"
+              v-slot="{ active, checked }"
           >
-            <div class="fixed inset-0 bg-black/25" />
-          </TransitionChild>
-
-          <div class="fixed inset-0 overflow-y-auto">
             <div
-                class="flex min-h-full items-center justify-center p-4 text-center"
+                :class="[
+                active
+                  ? 'ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300'
+                  : '',
+                checked ? 'bg-sky-900/75 text-white ' : 'bg-white ',
+              ]"
+                class="relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none"
             >
-              <TransitionChild
-                  as="template"
-                  enter="duration-300 ease-out"
-                  enter-from="opacity-0 scale-95 rotate-180"
-                  enter-to="opacity-100 scale-100 rotate-0"
-                  leave="duration-200 ease-in"
-                  leave-from="opacity-100 scale-100 rotate-0"
-                  leave-to="opacity-0 scale-95 rotate-180"
-              >
-                <DialogPanel
-                    class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
-                >
-                  <DialogTitle
-                      as="h3"
-                      class="text-lg font-medium leading-6 text-gray-900"
-                  >
-                    Payment successful
-                    <button class="absolute top-3 right-3"   @click="closeModal">
-                      <XCircleIcon class="h-5 w-5 text-gray-500" />
-                    </button>
-                  </DialogTitle>
-                  <div class="mt-2">
-                    <p class="text-sm text-gray-500">
-                      Your payment has been successfully submitted. We’ve sent you
-                      an email with all of the details of your order.
-                    </p>
-                  </div>
-
-                  <div class="mt-4">
-                    <button
-                        type="button"
-                        class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                        @click="closeModal"
+              <div class="flex w-full items-center justify-between">
+                <div class="flex items-center">
+                  <div class="text-sm">
+                    <RadioGroupLabel
+                        as="p"
+                        :class="checked ? 'text-white' : 'text-gray-900'"
+                        class="font-medium"
                     >
-                      Got it, thanks!
-                    </button>
+                      {{ plan.name }}
+                    </RadioGroupLabel>
+                    <RadioGroupDescription
+                        as="span"
+                        :class="checked ? 'text-sky-100' : 'text-gray-500'"
+                        class="inline"
+                    >
+                      <span> {{ plan.ram }}/{{ plan.cpus }}</span>
+                      <span aria-hidden="true"> &middot; </span>
+                      <span>{{ plan.disk }}</span>
+                    </RadioGroupDescription>
                   </div>
-                </DialogPanel>
-              </TransitionChild>
+                </div>
+                <div v-show="checked" class="shrink-0 text-white">
+                  <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none">
+                    <circle
+                        cx="12"
+                        cy="12"
+                        r="12"
+                        fill="#fff"
+                        fill-opacity="0.2"
+                    />
+                    <path
+                        d="M7 13l3 3 7-7"
+                        stroke="#fff"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                  </svg>
+                </div>
+              </div>
             </div>
-          </div>
-        </Dialog>
-      </TransitionRoot>
-
+          </RadioGroupOption>
+        </div>
+      </RadioGroup>
     </div>
   </div>
 </template>
@@ -77,25 +71,32 @@
 <script setup>
 import { ref } from 'vue'
 import {
-  TransitionRoot,
-  TransitionChild,
-  Dialog,
-  DialogPanel,
-  DialogTitle,
+  RadioGroup,
+  RadioGroupLabel,
+  RadioGroupDescription,
+  RadioGroupOption,
 } from '@headlessui/vue'
 
-import {XCircleIcon} from '@heroicons/vue/24/outline'
+const plans = [
+  {
+    name: 'Startup',
+    ram: '12GB',
+    cpus: '6 CPUs',
+    disk: '160 GB SSD disk',
+  },
+  {
+    name: 'Business',
+    ram: '16GB',
+    cpus: '8 CPUs',
+    disk: '512 GB SSD disk',
+  },
+  {
+    name: 'Enterprise',
+    ram: '32GB',
+    cpus: '12 CPUs',
+    disk: '1024 GB SSD disk',
+  },
+]
 
-const isOpen = ref(false)
-
-function closeModal() {
-  isOpen.value = false
-}
-function openModal() {
-  isOpen.value = true
-}
+const selected = ref(plans[0])
 </script>
-
-<style scoped>
-
-</style>
